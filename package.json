@@ -1,0 +1,9 @@
+{
+    "name": "mysql-api",
+    "version": "1.0.0",
+    "dependencies": {
+        "cassandra-driver": "^4.6.1",
+        "express": "^4.17.1",
+        "node-cassandra-cql": "^0.4.4"
+    }
+}
