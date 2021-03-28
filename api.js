@@ -3,20 +3,14 @@ const app = express();
 
 const cassandra = require('cassandra-driver');
 const client = new cassandra.Client({
-  contactPoints: ['35.238.19.186'],
+  contactPoints: ['host'],
   localDataCenter: 'us-central1',
-  keyspace: 'books_reviews',
-  credentials: { username: 'cassandra', password: 'oX44M3SVVZf9' }
+  keyspace: 'keyspace',
+  credentials: { username: 'username', password: 'password' }
 });
 
 app.get("/", function(request, response, next){
-    
-    client.execute('SELECT * FROM all_reviews_by_product_id LIMIT 3;', 
-      function(err, results) {
-        if (err) console.log(err);
-        else response.send(results);
-      }
-    );
+    response.end(`<h1>This is the first homework from the course Big Data Processing 2021</h1>`)
 });
 
 //Return all reviews for specified `product_id`
@@ -54,7 +48,7 @@ app.route('/reviews/products/:product_id')
 app.route('/reviews/customers/:customer_id')
   .get(function(request, response, next) {
     let id = request.params["customer_id"];
-    pool.query(`SELECT review_headline, review_body FROM all_reviews_by_customer_id  WHERE customer_id=${id}`, 
+    client.execute(`SELECT review_headline, review_body FROM all_reviews_by_customer_id  WHERE customer_id=${id}`, 
     function(err, results) {
         if(err) {
             console.log("ERROR\n");
@@ -70,7 +64,9 @@ app.route('/reviews/popular')
     let n = request.query.n;
     let date = request.query.date;
 
-    pool.query(`SELECT product_id, product_title, reviews_amount FROM top_N_products_by_date WHERE review_date = ${date} LIMIT ${ n == undefined ? 1 : n};`, 
+    console.log("top_n_products_by_date " + date)
+
+    client.execute(`SELECT product_id, product_title, reviews_amount FROM top_n_products_by_date WHERE review_date = '${date}' LIMIT ${ n == undefined ? 1 : n}`, 
     function(err, results) {
       if(err) {
           console.log("ERROR\n");
@@ -86,7 +82,7 @@ app.route('/customers/productive')
   let n = request.query.n;
   let date = request.query.date;
 
-  pool.query(`SELECT customer_id, reviews_amount FROM top_N_customers_by_date WHERE review_date = ${date} LIMIT ${ n == undefined ? 1 : n};`, 
+  client.execute(`SELECT customer_id, reviews_amount FROM top_N_customers_by_date WHERE review_date = '${date}' LIMIT ${ n == undefined ? 1 : n}`, 
   function(err, results) {
     if(err) {
         console.log("ERROR\n");
@@ -101,7 +97,7 @@ app.route('/haters')
   .get(function(request,response,next) {
     let n = request.query.n;
 
-    pool.query(`SELECT customer_id, bad_reviews_amount FROM top_N_haters_by_date WHERE review_date = ${date} LIMIT ${ n == undefined ? 1 : n};`, 
+    client.execute(`SELECT customer_id, bad_reviews_amount FROM top_N_haters_by_date WHERE review_date = '${date}' LIMIT ${ n == undefined ? 1 : n}`, 
     function(err, results) {
       if(err) {
           console.log("ERROR\n");
@@ -116,7 +112,7 @@ app.route('/backers')
   .get(function(request,response,next) {
     let n = request.query.n;
 
-    pool.query(`SELECT customer_id, good_reviews_amount FROM top_N_backers_by_date WHERE review_date = ${date} LIMIT ${ n == undefined ? 1 : n};`, function(err, results) {
+    client.execute(`SELECT customer_id, good_reviews_amount FROM top_N_backers_by_date WHERE review_date = '${date}' LIMIT ${ n == undefined ? 1 : n}`, function(err, results) {
       if(err) {
           console.log("ERROR\n");
           console.log(err);
