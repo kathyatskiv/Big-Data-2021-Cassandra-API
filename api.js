@@ -96,6 +96,7 @@ app.route('/customers/productive')
 app.route('/haters')
   .get(function(request,response,next) {
     let n = request.query.n;
+    let date = request.query.date;
 
     client.execute(`SELECT customer_id, bad_reviews_amount FROM top_N_haters_by_date WHERE review_date = '${date}' LIMIT ${ n == undefined ? 1 : n}`, 
     function(err, results) {
@@ -111,6 +112,7 @@ app.route('/haters')
 app.route('/backers')
   .get(function(request,response,next) {
     let n = request.query.n;
+    let date = request.query.date;
 
     client.execute(`SELECT customer_id, good_reviews_amount FROM top_N_backers_by_date WHERE review_date = '${date}' LIMIT ${ n == undefined ? 1 : n}`, function(err, results) {
       if(err) {
